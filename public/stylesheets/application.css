@@ -1,0 +1,103 @@
+BODY {
+  background-color: #ececec;
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 12px;
+}
+
+P, TABLE, TR, TD, TH {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 12px;  
+}
+
+A {
+  text-decoration: none;
+}
+
+A:hover {
+  text-decoration: underline;
+}
+
+.bp-title {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.bp-subtitle {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.bmn-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.bmn-text {
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.bmn-link {
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.bpd-style {
+  background-color: #ffffff;
+  border: 1px solid #333366;
+  padding: 2px;
+  border-collapse: collapse;  
+}
+
+.bc-border {
+  padding:2px 10px 2px 10px;
+  background-color:#f0f0f0;
+  border-left: 1px solid #cccccc;
+  border-right: 1px solid #cccccc;
+}
+
+/*** Administration Menu **************************************************/
+.bma-style {
+  background-color:#f0f0f0;
+}
+
+.bma-cell {
+  font-size:10px;
+  padding:0px 6px 0px 6px;
+  background-color:#e6e6e6;
+  border-bottom:1px solid #bfbfbf;
+}
+
+.bma-separator {
+  background-color:#e6e6e6;
+  border-bottom:1px solid #bfbfbf;
+}
+
+.bma-link {
+  font-size:10px;
+  color: #333333;
+  text-decoration: none;
+}
+
+.bma-link:hover {
+  color: #999999;
+  text-decoration: underline;
+}
+
+.bma-link:visited {
+  color: #666666;
+}
+
+.bma-link:visited:hover {
+  color: #999999;
+}
+
+.bma-link:active {
+  color: #ff0000;
+  }
+
+.bma-text {
+  font-size:10px;
+}

@@ -1,0 +1,139 @@
+A {
+  color: #000000;
+  text-decoration: none;
+}
+
+A:hover {
+  color: #666666;
+  text-decoration: underline;
+}
+
+/*** Calendar Layout ******************************************************/
+TABLE.bc-style, TR.bc-style, TH.bc-style, TD.bc-style {
+  border-collapse: collapse;
+}
+
+.bc-border {
+  padding:8px 10px 2px 10px;
+}
+
+TABLE.bc-style {
+  width: 100%;
+}
+
+.calendarHeader {
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.calendarMenuText {
+  padding:10px;
+}
+
+.bce-holiday {
+  padding:1px 2px 1px 2px;
+}
+
+/*** Category Layout ******************************************************/
+.bcc-style {
+
+}
+
+TABLE.bcc-style, TR.bcc-style, TH.bcc-style, TD.bcc-style {
+  border-collapse: collapse;
+}
+
+TABLE.bcc-style {
+  width: 100%;
+}
+
+/*** Administration Menu **************************************************/
+.bma-style {
+
+}
+
+.bma-cell {
+  font-size:10px;
+  padding:0px 6px 0px 6px;
+  background-color:#e6e6e6;
+  border-bottom:1px solid #bfbfbf;
+}
+
+.bma-separator {
+  background-color:#e6e6e6;
+  border-bottom:1px solid #bfbfbf;
+}
+
+.bma-link {
+  font-size:10px;
+  color: #333333;
+  text-decoration: none;
+}
+
+.bma-link:hover {
+  color: #999999;
+  text-decoration: underline;
+}
+
+.bma-link:visited {
+  color: #666666;
+}
+
+.bma-link:visited:hover {
+  color: #999999;
+}
+
+.bma-link:active {
+  color: #ff0000;
+  }
+
+.bma-text {
+  font-size:10px;
+}
+
+
+/*** Navigation Menu ******************************************************/
+.bmn-style {
+
+}
+
+.bmn-cell {
+  font-size:10px;
+  padding:0px 6px 0px 6px;
+  background-color:#e6e6e6;
+  border-bottom:1px solid #bfbfbf;
+}
+
+.bmn-separator {
+  background-color:#e6e6e6;
+  border-bottom:1px solid #bfbfbf;
+}
+
+.bmn-link {
+  margin:2px;
+  white-space: nowrap;
+  font-size:10px;
+  color: #333333;
+  text-decoration: none;
+}
+
+.bmn-link:hover {
+  color: #999999;
+  text-decoration: underline;
+}
+
+.bmn-link:visited {
+  color: #666666;
+}
+
+.bmn-link:visited:hover {
+  color: #999999;
+}
+
+.bmn-link:active {
+  color: #ff0000;
+  }
+
+.bmn-text {
+  font-size:10px;
+}

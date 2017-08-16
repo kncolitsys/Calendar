@@ -1,0 +1,199 @@
+BODY {
+ background-color : #FFFFFF;
+ font-family : Verdana,Arial,Helvetica,sans-serif;
+ font-size : 14px;
+ text-decoration : none;
+ scrollbar-base-color : #000052;
+ scrollbar-arrow-color : #FFFFFF;
+ scrollbar-track-color : #A6A6B2;
+}
+
+/* Header ***************************************/
+.bh-style  {
+ color : #ffffff;
+ font-size : 18px;
+ font-weight : bold;
+ text-align : right;
+ padding : 2px;
+ background-color : #000052;
+}
+
+/* Dialog ***************************************/
+.bp-style  {
+ background-color : #e0e0e0;
+}
+
+.bp-title  {
+ font-size : 18px;
+ font-weight : bold;
+}
+
+.bp-subtitle  {
+ font-size : 12px;
+ font-weight : bold;
+}
+
+.bpd-style  {
+ background-color : #ffffff;
+ border : 1px solid #ff0000;
+ padding : 2px;
+ border-collapse : collapse;
+ font-size : 12px;
+ width : 100%;
+}
+
+.bpd-title  {
+ background-color : #ff0000;
+ font-weight : bold;
+ color : #ffffff;
+}
+
+.bpd-subtitle  {
+ background-color : #d0d0d0;
+}
+
+/* Calendar *************************************/
+.bc-style  {
+ background-color : #ffffff;
+ border : 1px solid #ff0000;
+}
+
+.bc-page  {
+ border : 1px solid #d0d0d0;
+ background-color : #f3f3f3;
+}
+
+TH.bc-style  {
+ background-color : #e3e3e3;
+ font-size : 14px;
+}
+
+.bc-title  {
+ font-size : 18px;
+ font-weight : bold;
+}
+
+.bcd-style  {
+ font-size : 10px;
+ text-decoration : none;
+}
+
+.bcd-active  {
+ font-size : 12px;
+ font-weight : bold;
+ text-decoration : none;
+}
+
+.bcd-inactive  {
+ font-size : 12px;
+ color : #333333;
+ text-decoration : none;
+}
+
+.bcd-empty  {
+ background-color : #e0e0e0;
+}
+
+.bc-afterhours, .bc-alternate2, .bc-weekend  {
+ background-color : #e3e3e3;
+}
+
+.bc-workhours, .bc-alternate1, .bc-weekday  {
+ background-color : #eeeeee;
+}
+
+.bc-event  {
+ border : 1px solid #ff0000;
+ background-color : #e0e0e0;
+ font-size: 12px;
+}
+
+.bct-time  {
+ font-size : 12px;
+ font-weight : bold;
+ white-space : nowrap;
+}
+
+.bct-holiday  {
+ font-size : 12px;
+ color : #808080;
+}
+
+.bct-event  {
+ font-size : 12px;
+}
+
+.bct-smalltime  {
+ font-size : 10px;
+ color : #000000;
+ white-space : nowrap;
+}
+
+.bct-smallholiday  {
+ font-size : 10px;
+ color : #808080;
+ white-space : nowrap;
+}
+
+.bct-smallevent  {
+ font-size : 10px;
+ margin-bottom : 1px;
+ white-space : nowrap;
+}
+
+.bct-printevent  {
+ font-size : 12px;
+}
+
+.bct-printholiday  {
+ font-size : 12px;
+ color : #808080;
+}
+
+.bct-printtime  {
+ font-size : 12px;
+ font-weight : bold;
+}
+
+.bcm-style  {
+ background-color : #ff0000;
+}
+
+.bcm-text  {
+ background-color : #ff0000;
+ color : #ffffff;
+ font-size : 14px;
+ font-weight : bold;
+ padding : 0px 12px 0px 12px;
+}
+
+.bcm-text:hover  {
+ color : #ffffff;
+ text-decoration : underline;
+}
+
+.be-style  {
+ font-size : 12px;
+}
+
+.be-title  {
+ font-size : 14px;
+ font-weight : bold;
+}
+
+.be-description  {
+ font-size : 12px;
+}
+
+.be-heading  {
+ font-size : 12px;
+ font-weight : bold;
+}
+
+/* Category Layout ******************************/
+TD.bcc-style  {
+ background-color : #ffffff;
+ border : 1px solid #000052;
+ font-size : 10px;
+ text-align : center;
+}

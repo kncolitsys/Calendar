@@ -1,0 +1,90 @@
+****************************************************************************
+* INSTALLATION INSTRUCTIONS
+****************************************************************************
+
+**** PLEASE NOTE: calendarInfusion is currently in "beta" status.  Although
+most of the functionality has been implemented, it has not yet been fully
+tested.  Use at your own risk! :)
+
+ 1. Since you are reading this file, we will assume you have successfully
+    downloaded and unzipped the calendarInfusion installation package to
+	<unzip_root>.
+
+ 2. calendarInfusion relies on the Mach-II framework and it must be
+    installed in order to use calendarInfusion.  Please visit
+	http://www.mach-ii.com/ for more information.
+
+ 3. Copy the contents of this installation package to the appropriate
+    locations on your server.  The critical folders in this packages are:
+	
+		/app      - This folder contains all of the listeners, models,
+		            views, etc and is accessed via a single ColdFusion
+		            mapping.
+		/config   - These configuration files are read to initialize the
+		            application.  They can be located anywhere, as long
+		            as they can be read by the ColdFusion server.
+		/db       - Contains the database creation scripts.  These can be
+		            located anywhere.
+		/public   - This is the webroot of the application, it should be
+		            located within your webroot (e.g. C:\InetPub\wwwroot)
+
+	The remaining folders are for development and testing purposes (or, at
+	least, are not being used at this time).
+ 
+ 4. Create a ColdFusion mapping:
+    a. Login to the ColdFusion Administrator
+    b. Click on the 'Mappings' link
+    c. Enter the necessary information to create a new mapping:
+         Logical Path: /calendar
+         Directory Path: Absolute path to /app directory (from Step 3)
+
+ 5. Install the calendarInfusion databases
+    a. Microsoft Access
+       (1) Copy the calendarInfusion.mdb files from <unzip_root>\db to your
+	       preferred database storage location.
+    b. Microsoft SQL Server
+       (1) Create a new database for calendarInfusion
+       (2) Execute <unzip_root>\db\calendarinfusion_mssql.sql
+	c. MySQL
+       (1) Create a new database for calendarInfusion
+       (2) Execute <unzip_root>\db\calendarinfusion_mysql.sql
+	d. PostgreSQL
+       (1) Create a new database for calendarInfusion
+       (2) Execute <unzip_root>\db\calendarinfusion_postgresql.sql
+	e. Oracle
+	   (1) I don't have an Oracle development system, so you're on your own,
+	       but you can likely use the PostgreSQL scripts.
+ 
+ 5. Create the calendarInfusion DSN within the ColdFusion Administrator
+    a. Login to the ColdFusion Administrator
+    b. Click on the 'Data Sources' link
+    d. Create the DSN using the appropriate driver, login, and password       
+
+ 6. Update the /config/mach-ii.xml file with the values specific to your
+    environment. (See the Mach-II configuration instructions for more
+	details.)  If you installed the application using the mapping 'calendar'
+	and the website will be accessible via http://<your_domain>/calendar,
+	then the only thing you should need to change is the dbDsn and dbType
+	properties, which should reflect your DSN settings.
+	(e.g. 'calendar' and 'msaccess', respectively.)
+
+ 7. Update the /public/index.cfm file to point to your /config/mach-ii.xml
+    configuration file.
+
+ 8. You're ready to go.
+ 
+ Additional details...
+ 
+ -- To access the administrative sections of the applications, you will need
+    to login using the administrator account. The default username and
+    password are 'administrator' and 'password', respectively.  It is highly
+    recommended that you change the password after your first login.  Within
+    calendarInfusion, you can change the password by logging into the
+    application, accessing the default calendar, and clicking on the
+    'Profile' link in the navigation menu.
+	
+ -- If you want to extended calendarInfusion, there are some code generation
+    utilities contained in the /public/_utilities/ directory.  It is
+	recommended that you remove these on a production server.
+
+****************************************************************************

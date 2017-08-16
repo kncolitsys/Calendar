@@ -1,0 +1,55 @@
+BODY {
+  background-color: #ececec;
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 12px;
+}
+
+.bp-text {
+  font-size: 12px;
+  padding: 0px 0px 0px 20px;
+}
+
+.bp-title {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-weight: bold;
+  font-size: 22px;
+}
+
+.bp-subtitle {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.bp-section {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 12px;
+}
+
+.bp-heading {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 12px;
+}
+
+.bmn-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.bmn-text {
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.bpd-style {
+  background-color: #ffffff;
+  border: 1px solid #3A8544;
+  padding: 2px;
+  border-collapse: collapse;  
+}
+
+.bn-input {
+  font-weight: bold;
+}

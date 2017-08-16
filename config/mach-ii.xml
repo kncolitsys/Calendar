@@ -1,0 +1,1148 @@
+<mach-ii version="1.0">
+
+	<!-- PROPERTIES -->
+	<properties>
+		<!-- Modify these properties for your installation -->
+		<property name="dbDsn" value="calendar" />
+		<property name="dbType" value="msaccess" />
+
+		<!-- These properties do not need to be modified -->
+		<property name="defaultEvent" value="application.home" />
+		<property name="exceptionEvent" value="exception" />
+		<property name="applicationRoot" value="/calendar" />
+		<property name="eventParameter" value="cfevent" />
+		<property name="parameterPrecedence" value="form" />
+		<property name="maxEvents" value="10" />
+
+		<!-- Libraries -->
+		<property name="validationLib" value="calendar.libraries.validationlib" />
+		<property name="timezoneLib" value="calendar.libraries.timezonelib" />
+	</properties>
+
+	<!-- PLUGINS -->
+	<plugins>
+		<plugin name="ApplicationPlugin" type="calendar.plugins.ApplicationPlugin" />
+		<plugin name="AuthenticationPlugin" type="calendar.plugins.AuthenticationPlugin" />
+	</plugins>
+
+	<!-- LISTENERS -->
+	<listeners>
+		<listener name="CalendarListener" type="calendar.listeners.CalendarListener">
+			<invoker type="MachII.framework.invokers.CFCInvoker_Event" />
+		</listener>
+	</listeners>
+	
+	<!-- EVENT-FILTERS -->
+	<event-filters>
+		<event-filter name="eventArgs" type="MachII.filters.EventArgsFilter" />
+		<event-filter name="requiredFields" type="MachII.filters.RequiredFieldsFilter" />
+		<event-filter name="authorize" type="calendar.filters.AuthorizationFilter" />
+		<event-filter name="redirect" type="calendar.filters.RedirectFilter" />
+	</event-filters>
+
+	<!-- EVENT-HANDLERS -->
+	<event-handlers>
+		<!--== APPLICATION EVENTS =================================================================================-->
+		<event-handler event="application.home" access="public">
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.signin" access="public">
+			<view-page name="signin" contentKey="request.content" />
+			<announce event="layouts.application" />
+		</event-handler>
+
+		<event-handler event="main.signin.submitted" access="public">
+			<event-mapping event="loginSucceeded" mapping="calendar.home" />
+			<event-mapping event="loginFailed" mapping="main.signin" />
+			<notify listener="CalendarListener" method="loginUser" />
+		</event-handler>
+
+		<event-handler event="main.signout" access="public">
+			<announce event="main.signout.submitted" />
+		</event-handler>
+		
+		<event-handler event="main.signout.submitted" access="private">
+			<notify listener="CalendarListener" method="logoutUser" />
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.user.password.retrieve" access="public">
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.user.password.retrieve.submitted" access="public">
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.user.register" access="public">
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.user.register.submitted" access="public">
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.user.username.retrieve" access="public">
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.user.username.retrieve.submitted" access="public">
+			<announce event="calendar.home" />
+		</event-handler>
+
+		<event-handler event="main.access.denied" access="private">
+			<view-page name="access" contentKey="request.content" />
+			<announce event="layouts.calendar" />
+		</event-handler>
+
+		<event-handler event="exception" access="private">
+			<view-page name="exception" contentKey="request.content" />
+			<announce event="layouts.application" />
+		</event-handler>
+	
+		<!--== CALENDAR EVENTS ==============================================================================================-->
+		<event-handler event="calendar.home" access="public">
+			<notify listener="CalendarListener" method="getApprovedCalendars" resultKey="request.calendars" />
+			<view-page name="home" contentKey="request.content" />
+			<announce event="layouts.application" />
+		</event-handler>
+
+		<event-handler event="calendar.search" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="calendar.search" contentKey="request.content" />
+			<announce event="layouts.calendar" />
+		</event-handler>
+
+		<event-handler event="calendar.search.results" access="public">
+			<event-bean name="search" type="calendar.models.search.search" />
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<notify listener="CalendarListener" method="getSearchResults" resultKey="request.results" />
+			<view-page name="calendar.searchResults" contentKey="request.content" />
+			<announce event="layouts.calendar" />
+		</event-handler>
+
+		<event-handler event="calendar.view" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<notify listener="CalendarListener" method="getCalendarView" />
+		</event-handler>
+
+		<event-handler event="calendar.view.calendar.year.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.cys" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.calendar.month.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.cms" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.calendar.week.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.cws" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.calendar.day.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.cds" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.list.year.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.lys" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.list.month.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.lms" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.list.week.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.lws" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.list.day.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.lds" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.print.year.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.pys" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.print.month.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.pms" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.print.week.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.pws" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="calendar.view.print.day.standard" access="private">
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.holidays" />
+			<notify listener="CalendarListener" method="getCalendarEvents" resultKey="request.events" />
+			<view-page name="calendar.view.categories" contentKey="request.calendarCategories" />
+			<view-page name="calendar.view.pds" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+		
+		<event-handler event="calendar.display" access="private">
+			<announce event="layouts.calendar" />
+		</event-handler>	
+
+		<event-handler event="event.delete" access="public">
+			<notify listener="CalendarListener" method="deleteEvent" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="calendar.view" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="event.edit" access="public">
+			<notify listener="CalendarListener" method="getEvent" resultKey="request.eventItem" />
+			<notify listener="CalendarListener" method="getEventSeries" resultKey="request.eventSeries" />
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="event.edit" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="event.edit.submitted" access="public">
+			<event-bean name="eventItem" type="calendar.models.event.event" />
+			<notify listener="CalendarListener" method="updateEvent" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="event.view" />
+				<parameter name="argsToCopy" value="calendarId,eventId,seriesId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="event.export" access="public">
+			<notify listener="CalendarListener" method="getICalendarFile" resultKey="request.icalendar" />
+			<view-page name="control.event.icalendar" />
+		</event-handler>
+
+		<event-handler event="event.series.view" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getEventSeries" resultKey="request.eventSeries" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="event.series.view" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="event.series.edit" access="public">
+			<notify listener="CalendarListener" method="getEventSeries" resultKey="request.eventSeries" />
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="event.series.edit" contentKey="request.content" />
+			<announce event="layouts.calendar" />	
+		</event-handler>
+		
+		<event-handler event="event.series.edit.submitted" access="public">
+			<event-bean name="eventSeries" type="calendar.models.eventSeries.eventSeries" />
+			<notify listener="CalendarListener" method="updateEventSeries" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="event.series.view" />
+				<parameter name="argsToCopy" value="calendarId,seriesId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="event.series.submit" access="public">
+			<event-bean name="newEventSeriesBean" type="calendar.models.eventSeries.eventSeries" />
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="event.series.edit" contentKey="request.content" />
+			<announce event="layouts.calendar" />	
+		</event-handler>
+		
+		<event-handler event="event.series.submit.submitted" access="public">
+			<event-bean name="eventSeries" type="calendar.models.eventSeries.eventSeries" />
+			<notify listener="CalendarListener" method="createEventSeries" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="event.series.view" />
+				<parameter name="argsToCopy" value="calendarId,seriesId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="event.series.delete" access="public">
+			<notify listener="CalendarListener" method="deleteEventSeries" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="calendar.view" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="event.submit" access="public">
+			<event-bean name="newEventBean" type="calendar.models.event.event" />
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="event.edit" contentKey="request.content" />
+			<announce event="layouts.calendar" />
+		</event-handler>
+
+		<event-handler event="event.submit.submitted" access="public">
+			<event-bean name="eventItem" type="calendar.models.event.event" />
+			<notify listener="CalendarListener" method="createEvent" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="event.view" />
+				<parameter name="argsToCopy" value="calendarId,eventId,seriesId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="event.view" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getEvent" resultKey="request.eventItem" />
+			<notify listener="CalendarListener" method="getEventSeries" resultKey="request.eventSeries" />
+			<notify listener="CalendarListener" method="getEventSeriesReminder" resultKey="request.reminder" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="reminder.edit" contentKey="request.reminderPod" />
+			<view-page name="event.view" contentKey="request.content" />
+			<announce event="layouts.calendar" />			
+		</event-handler>
+
+		<event-handler event="profile.view" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<view-page name="profile.view" contentKey="request.content" />
+			<announce event="layouts.calendar" />
+		</event-handler>
+		
+		<event-handler event="profile.settings.edit" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getSessionUser" resultKey="request.user" />
+			<view-page name="profile.settings.edit" contentKey="request.content" />
+			<announce event="layouts.calendar" />
+		</event-handler>
+		
+		<event-handler event="profile.settings.edit.submitted" access="public">
+			<event-bean name="user" type="calendar.models.user.user" />
+			<notify listener="CalendarListener" method="updateUser" />
+			<notify listener="CalendarListener" method="updateSessionUser" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="profile.view" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+		
+		<event-handler event="profile.password.edit" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<view-page name="profile.password.edit" contentKey="request.content" />
+			<announce event="layouts.calendar" />
+		</event-handler>
+		
+		<event-handler event="profile.password.edit.submitted" access="public">
+			<announce event="profile.view" />
+		</event-handler>
+
+		<event-handler event="reminder.edit.submitted" access="public">
+			<event-bean name="reminder" type="calendar.models.reminder.reminder" />
+			<notify listener="CalendarListener" method="createEventSeriesReminder" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="event.view" />
+				<parameter name="argsToCopy" value="calendarId,eventId,seriesId" />
+			</filter>
+		</event-handler>
+
+		<!--== ADMINISTRATOR EVENTS ==========================================================================================-->
+		<event-handler event="administrator.home" access="public">
+			<view-page name="administrator.home" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.calendar" access="public">
+			<notify listener="CalendarListener" method="getCalendars" resultKey="request.calendars" />
+			<view-page name="calendars.list" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.calendar.delete" access="public">
+			<notify listener="CalendarListener" method="deleteCalendar" />
+			<announce event="administrator.calendar" />
+		</event-handler>
+
+		<event-handler event="administrator.calendar.edit" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getGroups" resultKey="request.groups" />
+			<view-page name="calendar.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.calendar.edit.submitted" access="public">
+			<event-bean name="calendar" type="calendar.models.calendar.calendar" />
+			<notify listener="CalendarListener" method="updateCalendar" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.calendar" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.calendar.new" access="public">
+			<event-bean name="calendarBean" type="calendar.models.calendar.calendar" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getGroups" resultKey="request.groups" />
+			<view-page name="calendar.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.calendar.new.submitted" access="public">
+			<event-bean name="calendar" type="calendar.models.calendar.calendar" />
+			<notify listener="CalendarListener" method="createCalendar" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.calendar" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.debug" access="public">
+			<announce event="administrator.debug.edit" />
+		</event-handler>
+
+		<event-handler event="administrator.debug.edit" access="public">
+			<notify listener="CalendarListener" method="getDebugConfiguration" resultKey="request.debug" />
+			<view-page name="debug.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.debug.edit.submitted" access="public">
+			<notify listener="CalendarListener" method="updateDebugConfiguration" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.home" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.groups" access="public">
+			<notify listener="CalendarListener" method="getGroups" resultKey="request.groups" />
+			<view-page name="groups.list" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.group.delete" access="public">
+			<notify listener="CalendarListener" method="deleteGroup" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.groups" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.group.edit" access="public">
+			<notify listener="CalendarListener" method="getGroup" resultKey="request.group" />
+			<view-page name="group.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.group.edit.submitted" access="public">
+			<event-bean name="group" type="calendar.models.group.group" />
+			<notify listener="CalendarListener" method="updateGroup" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.groups" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.group.new" access="public">
+			<event-bean name="groupBean" type="calendar.models.group.group" />
+			<view-page name="group.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.group.new.submitted" access="public">
+			<event-bean name="group" type="calendar.models.group.group" />
+			<notify listener="CalendarListener" method="createGroup" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.groups" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.group.membership" access="public">
+			<notify listener="CalendarListener" method="getUsers" resultKey="request.users" />
+			<notify listener="CalendarListener" method="getGroup" resultKey="request.group" />
+			<view-page name="group.membership" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.group.membership.submitted" access="public">
+			<notify listener="CalendarListener" method="updateGroupMembers" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.group.edit" />
+				<parameter name="argsToCopy" value="groupId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.group.permissions" access="public">
+			<notify listener="CalendarListener" method="getApplication" resultKey="request.application" />
+			<notify listener="CalendarListener" method="getCalendars" resultKey="request.calendars" />
+			<notify listener="CalendarListener" method="getGroup" resultKey="request.group" />
+			<view-page name="group.permissions" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.group.calendar.permissions" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getApplication" resultKey="request.application" />
+			<notify listener="CalendarListener" method="getCalendars" resultKey="request.calendars" />
+			<notify listener="CalendarListener" method="getGroup" resultKey="request.group" />
+			<view-page name="group.permissions" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.group.permissions.submitted" access="public">
+			<notify listener="CalendarListener" method="updateGroupPermissions" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.group.edit" />
+				<parameter name="argsToCopy" value="groupId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.holidays" access="public">
+			<notify listener="CalendarListener" method="getGlobalHolidays" resultKey="request.holidays" />
+			<view-page name="holidays.list" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.holiday.delete" access="public">
+			<notify listener="CalendarListener" method="deleteHoliday" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.holidays" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.holiday.edit" access="public">
+			<notify listener="CalendarListener" method="getHoliday" resultKey="request.holiday" />
+			<view-page name="holiday.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.holiday.edit.submitted" access="public">
+			<event-bean name="holiday" type="calendar.models.holiday.holiday" />
+			<notify listener="CalendarListener" method="updateHoliday" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.holidays" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.holiday.new" access="public">
+			<event-bean name="holidayBean" type="calendar.models.holiday.holiday" />
+			<view-page name="holiday.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.holiday.new.submitted" access="public">
+			<event-bean name="holiday" type="calendar.models.holiday.holiday" />
+			<notify listener="CalendarListener" method="createHoliday" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.holidays" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.language" access="public">
+			<announce event="administrator.language.edit" />
+		</event-handler>
+		
+		<event-handler event="administrator.language.edit" access="public">
+			<notify listener="CalendarListener" method="getLanguage" resultKey="request.language" />
+			<notify listener="CalendarListener" method="getSupportedLanguages" resultKey="request.supportedLanguages" />
+			<view-page name="language.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.language.edit.submitted" access="public">
+			<notify listener="CalendarListener" method="updateLanguage" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.home" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.server" access="public">
+			<announce event="administrator.server.edit" />
+		</event-handler>
+
+		<event-handler event="administrator.server.edit" access="public">
+			<notify listener="CalendarListener" method="getMailServer" resultKey="request.mailserver" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="server.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.server.edit.submitted" access="public">
+			<event-bean name="mailserver" type="calendar.models.mailserver.mailserver" />
+			<notify listener="CalendarListener" method="updateMailServer" />
+			<notify listener="CalendarListener" method="updateServerTimezone" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.home" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.schemes" access="public">
+			<notify listener="CalendarListener" method="getSchemes" resultKey="request.schemes" />
+			<view-page name="schemes.list" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.scheme.delete" access="public">
+			<notify listener="CalendarListener" method="deleteScheme" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.schemes" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.scheme.edit" access="public">
+			<notify listener="CalendarListener" method="getScheme" resultKey="request.scheme" />
+			<view-page name="scheme.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.scheme.edit.submitted" access="public">
+			<event-bean name="scheme" type="calendar.models.scheme.scheme" />
+			<notify listener="CalendarListener" method="updateScheme" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.schemes" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+		
+		<event-handler event="administrator.scheme.new" access="public">
+			<event-bean name="schemeBean" type="calendar.models.scheme.scheme" />
+			<view-page name="scheme.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.scheme.new.submitted" access="public">
+			<event-bean name="scheme" type="calendar.models.scheme.scheme" />
+			<notify listener="CalendarListener" method="createScheme" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.schemes" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+		
+		<event-handler event="administrator.search" access="public">
+			<notify listener="CalendarListener" method="getSearchIndexes" resultKey="request.searchIndexes" />
+			<view-page name="searchIndex.list" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.search.edit" access="public">
+			<notify listener="CalendarListener" method="getCalendarSearchIndex" resultKey="request.searchIndex" />
+			<view-page name="searchIndex.manage" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.search.edit.submitted" access="public">
+			<notify listener="CalendarListener" method="getSearchIndex" resultKey="request.searchIndex" />
+			<notify listener="CalendarListener" method="manageSearchIndex" resultKey="request.executionTime" />
+			<view-page name="searchIndex.status" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.user.delete" access="public">
+			<notify listener="CalendarListener" method="deleteUser" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.users" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.users" access="public">
+			<notify listener="CalendarListener" method="getUsers" resultKey="request.users" />
+			<view-page name="users.list" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+		
+		<event-handler event="administrator.user.edit" access="public">
+			<notify listener="CalendarListener" method="getUser" resultKey="request.user" />
+			<view-page name="user.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.user.new" access="public">
+			<event-bean name="userBean" type="calendar.models.user.user" />
+			<view-page name="user.edit" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.user.new.submitted" access="public">
+			<event-bean name="user" type="calendar.models.user.user" />
+			<notify listener="CalendarListener" method="createUser" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.users" />
+				<parameter name="argsToCopy" value="" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="administrator.user.permissions" access="public">
+			<notify listener="CalendarListener" method="getApplication" resultKey="request.application" />
+			<notify listener="CalendarListener" method="getCalendars" resultKey="request.calendars" />
+			<notify listener="CalendarListener" method="getUser" resultKey="request.user" />
+			<view-page name="user.permissions" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.user.calendar.permissions" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getApplication" resultKey="request.application" />
+			<notify listener="CalendarListener" method="getCalendars" resultKey="request.calendars" />
+			<notify listener="CalendarListener" method="getUser" resultKey="request.user" />
+			<view-page name="user.permissions" contentKey="request.content" />
+			<announce event="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="administrator.user.permissions.submitted" access="public">
+			<notify listener="CalendarListener" method="updateUserPermissions" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="administrator.user.edit" />
+				<parameter name="argsToCopy" value="userId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="application.version" access="public">
+			<view-page name="application.version" contentKey="request.content" />
+			<announce event="layouts.application" />
+		</event-handler>
+		
+		<!--== EDITOR EVENTS ============================================================================================== -->
+		<event-handler event="editor.home" access="public">
+			<view-page name="editor.home" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.calendar" access="public">
+			<announce event="editor.calendar.edit" />
+		</event-handler>
+
+		<event-handler event="editor.calendar.edit" access="public">
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getPrivileges" resultKey="request.privileges" />
+			<notify listener="CalendarListener" method="getSchemes" resultKey="request.schemes" />
+			<view-page name="calendar.options.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.calendar.edit.submitted" access="public">
+			<event-bean name="calendar" type="calendar.models.calendar.calendar" />
+			<notify listener="CalendarListener" method="updateCalendarOptions" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.home" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.categories" access="public">
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<view-page name="categories.list" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.category.delete" access="public">
+			<notify listener="CalendarListener" method="deleteCategory" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.categories" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.category.edit" access="public">
+			<notify listener="CalendarListener" method="getCategory" resultKey="request.category" />
+			<view-page name="category.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.category.edit.submitted" access="public">
+			<event-bean name="category" type="calendar.models.category.category" />
+			<notify listener="CalendarListener" method="updateCategory" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.categories" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.category.new" access="public">
+			<event-bean name="categoryBean" type="calendar.models.category.category" />
+			<view-page name="category.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.category.new.submitted" access="public">
+			<event-bean name="category" type="calendar.models.category.category" />
+			<notify listener="CalendarListener" method="createCategory" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.categories" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.events" access="public">
+			<notify listener="CalendarListener" method="getCalendarEventSeries" resultKey="request.events" />
+			<view-page name="events.list" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.events.approve" access="public">
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<view-page name="events.approval" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.events.approve.submitted" access="public">
+			<notify listener="CalendarListener" method="approveEvents" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.events.approve" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.event.delete" access="public">
+			<notify listener="CalendarListener" method="deleteEventSeries" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.events" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.event.edit" access="public">
+			<notify listener="CalendarListener" method="getEventSeries" resultKey="request.eventSeries" />
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<notify listener="CalendarListener" method="getServerTimeZone" resultKey="request.timezone" />
+			<view-page name="event.series.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.event.edit.submitted" access="public">
+			<event-bean name="eventSeries" type="calendar.models.eventSeries.eventSeries" />
+			<notify listener="CalendarListener" method="updateEventSeries" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.events" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.event.new" access="public">
+			<event-bean name="newEventSeriesBean" type="calendar.models.eventSeries.eventSeries" />
+			<notify listener="CalendarListener" method="getCalendar" resultKey="request.calendar" />
+			<notify listener="CalendarListener" method="getCalendarCategories" resultKey="request.categories" />
+			<notify listener="CalendarListener" method="getCalendarOptions" resultKey="request.options" />
+			<notify listener="CalendarListener" method="getCalendarUnapprovedEventSeries" resultKey="request.unapprovedEvents" />
+			<view-page name="event.series.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.event.new.submitted" access="public">
+			<event-bean name="eventSeries" type="calendar.models.eventSeries.eventSeries" />
+			<notify listener="CalendarListener" method="createEventSeries" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.events" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.holidays" access="public">
+			<notify listener="CalendarListener" method="getCalendarHolidays" resultKey="request.calendarHolidays" />
+			<notify listener="CalendarListener" method="getCalendarDisplayedHolidays" resultKey="request.displayedHolidays" />
+			<notify listener="CalendarListener" method="getGlobalHolidays" resultKey="request.holidays" />
+			<view-page name="holidays.list" contentKey="request.holidaySelectionList" />
+			<view-page name="holidays.manage" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.holiday.delete" access="public">
+			<notify listener="CalendarListener" method="deleteHoliday" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.holidays" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.holiday.edit" access="public">
+			<notify listener="CalendarListener" method="getHoliday" resultKey="request.holiday" />
+			<view-page name="holiday.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.holiday.edit.submitted" access="public">
+			<event-bean name="holiday" type="calendar.models.holiday.holiday" />
+			<notify listener="CalendarListener" method="updateHoliday" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.holidays" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.holiday.new" access="public">
+			<event-bean name="holidayBean" type="calendar.models.holiday.holiday" />
+			<view-page name="holiday.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.holiday.new.submitted" access="public">
+			<event-bean name="holiday" type="calendar.models.holiday.holiday" />
+			<notify listener="CalendarListener" method="createHoliday" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.holidays" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.holidays.display.submitted" access="public">
+			<notify listener="CalendarListener" method="updateDisplayedCalendarHolidays" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.holidays" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.mail.configuration" access="public">
+			<view-page name="mailConfigs.list" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.mail.configuration.edit" access="public">
+			<notify listener="CalendarListener" method="getMailConfiguration" resultKey="request.mailConfiguration" />
+			<view-page name="mailConfig.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.mail.configuration.edit.submitted" access="public">
+			<notify listener="CalendarListener" method="updateMailConfiguration" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.mail.configuration" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.schemes" access="public">
+			<notify listener="CalendarListener" method="getCalendarSchemes" resultKey="request.schemes" />
+			<view-page name="schemes.list" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.scheme.delete" access="public">
+			<notify listener="CalendarListener" method="deleteScheme" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.schemes" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.scheme.edit" access="public">
+			<notify listener="CalendarListener" method="getScheme" resultKey="request.scheme" />
+			<view-page name="scheme.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.scheme.edit.submitted" access="public">
+			<event-bean name="scheme" type="calendar.models.scheme.scheme" />
+			<notify listener="CalendarListener" method="updateScheme" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.schemes" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<event-handler event="editor.scheme.new" access="public">
+			<event-bean name="schemeBean" type="calendar.models.scheme.scheme" />
+			<view-page name="scheme.edit" contentKey="request.content" />
+			<announce event="layouts.editor" />
+		</event-handler>
+
+		<event-handler event="editor.scheme.new.submitted" access="public">
+			<event-bean name="scheme" type="calendar.models.scheme.scheme" />
+			<notify listener="CalendarListener" method="createScheme" />
+			<filter name="redirect">
+				<parameter name="announceEvent" value="editor.schemes" />
+				<parameter name="argsToCopy" value="calendarId" />
+			</filter>
+		</event-handler>
+
+		<!--== HELP EVENTS =================================================================================================-->
+		<event-handler event="help" access="public">
+			<view-page name="help.home" contentKey="request.content" />
+			<announce event="layouts.help" />
+		</event-handler>
+
+		<!--== LAYOUTS EVENTS ==============================================================================================-->
+		<event-handler event="layouts.application" access="private">
+			<view-page name="layouts.application" />
+		</event-handler>
+		
+		<event-handler event="layouts.calendar" access="private">
+			<notify listener="CalendarListener" method="getCalendarHeader" resultKey="request.calendarHeader" />
+			<notify listener="CalendarListener" method="getCalendarFooter" resultKey="request.calendarFooter" />
+			<notify listener="CalendarListener" method="getCalendarDefaultScheme" resultKey="request.calendarDefaultScheme" />
+			<view-page name="layouts.calendar" />
+		</event-handler>
+
+		<event-handler event="layouts.editor" access="private">
+			<view-page name="layouts.editor" />
+		</event-handler>
+		
+		<event-handler event="layouts.administrator" access="private">
+			<view-page name="layouts.administrator" />
+		</event-handler>
+
+		<event-handler event="layouts.help" access="private">
+			<view-page name="layouts.help" />
+		</event-handler>
+	</event-handlers>
+	
+	<!-- PAGE-VIEWS -->
+	<page-views>
+		<!-- Layouts -->
+		<page-view name="layouts.administrator" page="/views/layouts/administrator.cfm" />
+		<page-view name="layouts.application" page="/views/layouts/application.cfm" />
+		<page-view name="layouts.blank" page="/views/layouts/blank.cfm" />
+		<page-view name="layouts.calendar" page="/views/layouts/calendar.cfm" />
+		<page-view name="layouts.editor" page="/views/layouts/editor.cfm" />
+		<page-view name="layouts.help" page="/views/layouts/help.cfm" />
+
+		<!-- Top level views -->
+		<page-view name="control.event.icalendar" page="/views/eventICalendar.cfm" />
+		<page-view name="exception" page="/views/shared/exception.cfm" />
+		<page-view name="application.version" page="/views/versionInfo.cfm" />
+		<page-view name="home" page="/views/applicationCalendars.cfm" />
+		<page-view name="signin" page="/views/shared/userSignin.cfm" />
+		
+		<!-- Calendar Views -->
+		<page-view name="calendar.view.cds" page="/views/calendar/calendarViewCDS.cfm" />
+		<page-view name="calendar.view.cms" page="/views/calendar/calendarViewCMS.cfm" />
+		<page-view name="calendar.view.cws" page="/views/calendar/calendarViewCWS.cfm" />
+		<page-view name="calendar.view.cys" page="/views/calendar/calendarViewCYS.cfm" />
+		<page-view name="calendar.view.lds" page="/views/calendar/calendarViewLDS.cfm" />
+		<page-view name="calendar.view.lms" page="/views/calendar/calendarViewLMS.cfm" />
+		<page-view name="calendar.view.lws" page="/views/calendar/calendarViewLWS.cfm" />
+		<page-view name="calendar.view.lys" page="/views/calendar/calendarViewLYS.cfm" />
+		<page-view name="calendar.view.pds" page="/views/calendar/calendarViewPDS.cfm" />
+		<page-view name="calendar.view.pms" page="/views/calendar/calendarViewPMS.cfm" />
+		<page-view name="calendar.view.pws" page="/views/calendar/calendarViewPWS.cfm" />
+		<page-view name="calendar.view.pys" page="/views/calendar/calendarViewPYS.cfm" />
+		<page-view name="calendar.view.categories" page="/views/calendar/categories.cfm" />
+		<page-view name="calendar.search" page="/views/calendar/search.cfm" />
+		<page-view name="calendar.searchResults" page="/views/calendar/searchResults.cfm" />
+		<page-view name="event.edit" page="/views/calendar/eventEdit.cfm" />
+		<page-view name="event.series.edit" page="/views/calendar/eventSeriesEdit.cfm" />
+		<page-view name="event.view" page="/views/calendar/eventView.cfm" />
+		<page-view name="event.series.view" page="/views/calendar/eventSeriesView.cfm" />
+		<page-view name="profile.view" page="/views/calendar/profileView.cfm" />
+		<page-view name="profile.settings.edit" page="/views/calendar/profileSettingsEdit.cfm" />
+		<page-view name="profile.password.edit" page="/views/calendar/profilePasswordEdit.cfm" />
+		<page-view name="reminder.edit" page="/views/calendar/reminderEdit.cfm" />
+				
+		<!-- Administrator Views -->
+		<page-view name="administrator.home" page="/views/administrator/home.cfm" />
+		<page-view name="calendar.edit" page="/views/administrator/calendarEdit.cfm" />
+		<page-view name="calendars.list" page="/views/administrator/calendars.cfm" />
+		<page-view name="debug.edit" page="/views/administrator/applicationDebugEdit.cfm" />
+		<page-view name="group.edit" page="/views/administrator/groupEdit.cfm" />
+		<page-view name="group.permissions" page="/views/administrator/groupPermissions.cfm" />
+		<page-view name="group.membership" page="/views/administrator/groupMembership.cfm" />
+		<page-view name="groups.list" page="/views/administrator/groups.cfm" />		
+		<page-view name="language.edit" page="/views/administrator/languageEdit.cfm" />
+		<page-view name="searchIndex.list" page="/views/administrator/searchIndexSelectionList.cfm" />
+		<page-view name="searchIndex.manage" page="/views/administrator/searchIndexManagement.cfm" />
+		<page-view name="searchIndex.status" page="/views/administrator/searchIndexStatus.cfm" />
+		<page-view name="server.edit" page="/views/administrator/serverEdit.cfm" />
+		<page-view name="user.edit" page="/views/administrator/userEdit.cfm" />
+		<page-view name="user.permissions" page="/views/administrator/userPermissions.cfm" />
+		<page-view name="users.list" page="/views/administrator/users.cfm" />
+		
+		<!-- Editor Views -->
+		<page-view name="calendar.options.edit" page="/views/editor/calendarOptionsEdit.cfm" />
+		<page-view name="mailConfigs.list" page="/views/editor/mailConfigSelectionList.cfm" />
+		<page-view name="mailConfig.edit" page="/views/editor/mailConfigEdit.cfm" />
+		<page-view name="holidays.manage" page="/views/editor/holidaysManage.cfm" />
+		<page-view name="editor.home" page="/views/editor/editorHome.cfm" />
+		<page-view name="events.list" page="/views/editor/eventSelectionList.cfm" />
+		<page-view name="events.approval" page="/views/editor/eventApproval.cfm" />
+		<page-view name="categories.list" page="/views/editor/categorySelectionList.cfm" />
+		<page-view name="category.edit" page="/views/editor/categoryEdit.cfm" />
+		<page-view name="schemes.list" page="/views/editor/schemeSelectionList.cfm" />
+		<page-view name="scheme.edit" page="/views/editor/schemeEdit.cfm" />
+
+		<!-- Help Views -->
+		<page-view name="help.htmlHeader" page="/views/help/htmlHeader.cfm" />
+		<page-view name="help.htmlFooter" page="/views/help/htmlFooter.cfm" />
+		<page-view name="help.header" page="/views/help/header.cfm" />
+		<page-view name="help.footer" page="/views/help/footer.cfm" />
+		<page-view name="help.home" page="/views/help/index.cfm" />
+
+		<!-- Shared Views -->
+		<page-view name="holidays.list" page="/views/shared/holidaySelectionList.cfm" />
+		<page-view name="holiday.edit" page="/views/shared/holidayEdit.cfm" />
+	</page-views>
+	
+</mach-ii>
